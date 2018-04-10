@@ -1,0 +1,19 @@
+checks:
+  php:
+    code_rating: true
+    duplication: true
+
+filter:
+  paths:
+    - src/*
+
+build:
+  environment:
+    php: '7.2.0'
+  tests:
+    override:
+      -
+        command: 'vendor/bin/phpunit --coverage-clover=coverage tests/'
+        coverage:
+          file: coverage
+          format: clover

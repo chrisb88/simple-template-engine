@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace simpleTemplate\processors;
 
@@ -109,7 +109,7 @@ class EachProcessor extends BaseProcessor
         }
 
         // ,{{else}} or just ,
-        if ((!empty($matches[6]) && !empty($matches[7])) || !empty($matches[8]) ) {
+        if ((!empty($matches[6]) && !empty($matches[7])) || !empty($matches[8])) {
             return [
                 'left' => isset($matches[8]) ? $matches[8] : $matches[6],
                 'right' => ''

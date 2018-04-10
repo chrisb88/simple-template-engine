@@ -1,0 +1,17 @@
+language: php
+
+php:
+  - 7.1
+  - 7.2
+
+env:
+  matrix:
+    - COMPOSER_FLAGS="--prefer-lowest"
+    - COMPOSER_FLAGS="--prefer-stable"
+
+install:
+  - composer self-update
+  - composer update --no-interaction --prefer-source $COMPOSER_FLAGS
+
+script:
+  - vendor/bin/phpunit --coverage-clover=coverage.xml tests/
