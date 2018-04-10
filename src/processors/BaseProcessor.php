@@ -23,6 +23,17 @@ abstract class BaseProcessor
     }
 
     /**
+     * Sets (and substitutes) the variables.
+     * @param array $variables
+     * @return $this
+     */
+    public function setVariables(array $variables)
+    {
+        $this->variables = $variables;
+        return $this;
+    }
+
+    /**
      * Must be implemented in subclass.
      * @param string $template Text to process
      * @return string

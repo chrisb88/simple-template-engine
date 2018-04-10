@@ -3,36 +3,26 @@ declare(strict_types=1);
 
 namespace simpleTemplate;
 
-use simpleTemplate\processors\EachProcessor;
-use simpleTemplate\processors\SimpleVarProcessor;
-
 class Template
 {
     private $templateFile;
+    private $processorConfig;
     private $templateContent;
     private $variables = [];
 
-    public function __construct($templateFile)
+    public function __construct($templateFile, TemplateProcessorConfig $processorConfig)
     {
         if (!file_exists($templateFile) || !is_file($templateFile) || !is_readable($templateFile)) {
             throw new \InvalidArgumentException(sprintf('Template is not a valid file: "%s".', $templateFile));
         }
 
         $this->templateFile = $templateFile;
+        $this->processorConfig = $processorConfig;
     }
 
     public function setVar($name, $value)
     {
         $this->variables[$name] = $value;
-    }
-
-    public function getVar($name)
-    {
-        if (isset($this->variables[$name])) {
-            return $this->variables[$name];
-        }
-
-        return false;
     }
 
     public function render(): string
@@ -51,13 +41,6 @@ class Template
 
     protected function processTemplate(): string
     {
-        $eachProcessor = new EachProcessor($this->variables);
-        $simpleVarProcessor = new SimpleVarProcessor($this->variables);
-
-        $output = $this->templateContent;
-        $output = $eachProcessor->process($output);
-        $output = $simpleVarProcessor->process($output);
-
-        return $output;
+        return $this->processorConfig->processAll($this->templateContent, $this->variables);
     }
 }
