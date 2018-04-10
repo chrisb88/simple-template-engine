@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace simpleTemplate;
 
+use simpleTemplate\processors\EachProcessor;
+use simpleTemplate\processors\SimpleVarProcessor;
+
 class Template
 {
     private $templateFile;
@@ -48,65 +51,13 @@ class Template
 
     protected function processTemplate(): string
     {
+        $eachProcessor = new EachProcessor($this->variables);
+        $simpleVarProcessor = new SimpleVarProcessor($this->variables);
+
         $output = $this->templateContent;
-        $output = $this->processEach($output);
-        $output = $this->substituteSimpleVars($output);
+        $output = $eachProcessor->process($output);
+        $output = $simpleVarProcessor->process($output);
 
         return $output;
-    }
-
-    protected function substituteSimpleVars($text): string
-    {
-        $text = preg_replace_callback('/{{(\w+)}}/', function($matches) {
-            if (isset($matches[1])) {
-                $var = $this->getVar($matches[1]);
-                if ($var !== false) {
-                    return $var;
-                }
-            }
-
-            return $matches[0];
-        }, $text);
-
-        return $text;
-    }
-
-    protected function processEach($text)
-    {
-        $text = preg_replace_callback('/({{\#each (.+?)}}\n?)(.+)({{\/each}}\n?)/s', function($matches) {
-            if (isset($matches[2]) && isset($matches[3])) {
-                $var = $this->getVar($matches[2]);
-                if ($var !== false) {
-                    $out = '';
-                    $subTemplate = $matches[3];
-                    foreach ($var as $row) {
-                        $out .= $this->substitute($subTemplate, $row);
-                    }
-
-                    return $out;
-                }
-            }
-
-            return $matches[0];
-        }, $text);
-
-        return $text;
-    }
-
-    private function substitute($text, $vars)
-    {
-        $text = preg_replace_callback('/{{(\w+)}}/', function($matches) use ($vars) {
-            if ($matches[1]) {
-                foreach ($vars as $var => $value) {
-                    if ($matches[1] === $var) {
-                        return $value;
-                    }
-                }
-            }
-
-            return $matches[0];
-        }, $text);
-
-        return $text;
     }
 }
