@@ -19,7 +19,7 @@ class SimpleVarProcessor extends BaseProcessor
     public function process(string $template): string
     {
         $template = preg_replace_callback('/{{(\w+)}}/', function($matches) {
-            if (isset($matches[1])) {
+            if (!empty($matches[1])) {
                 $var = $this->getVar($matches[1]);
                 if ($var !== null) {
                     return $var;

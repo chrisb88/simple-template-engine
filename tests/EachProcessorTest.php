@@ -94,6 +94,22 @@ EOT;
         $this->assertEquals($expected, $output);
     }
 
+    public function testInvalidEach()
+    {
+        $template = <<<EOT
+Here is text
+{{#each array}}{{/each}}
+and more text here
+EOT;
+
+        $processor = new EachProcessor([
+            'array' => []
+        ]);
+
+        $output = $processor->process($template);
+        $this->assertEquals($template, $output);
+    }
+
     public function testExtractUnlessParams()
     {
         $processor = new EachProcessor();
@@ -273,6 +289,40 @@ EOT;
                 ],
                 [
                     'var1' => 'and more and more',
+                    'var2' => 'even more text',
+                ],
+                [
+                    'var1' => 'text',
+                    'var2' => 'more text',
+                ]
+            ]
+        ]);
+
+        $output = $processor->process($template);
+        $this->assertEquals($expected, $output);
+    }
+
+    public function testUnlessInvalid()
+    {
+        $template = <<<EOT
+Here is text
+{{#each array}}
+  text {{var1}} text and {{var2}}{{#unless @invalid}},{{else}}!{{/unless}}
+{{/each}}
+and more text here
+EOT;
+
+        $expected = <<<EOT
+Here is text
+  text and more text and even more text{{#unless @invalid}},{{else}}!{{/unless}}
+  text text text and more text{{#unless @invalid}},{{else}}!{{/unless}}
+and more text here
+EOT;
+
+        $processor = new EachProcessor([
+            'array' => [
+                [
+                    'var1' => 'and more',
                     'var2' => 'even more text',
                 ],
                 [

@@ -6,10 +6,11 @@ use simpleTemplate\processors\NullProcessor;
 
 final class BaseProcessorTest extends TestCase
 {
-    public function getVar()
+    public function testGetVar()
     {
         $processor = new NullProcessor();
         $this->assertNull($processor->getVar('notExistingVariable'));
+        $this->assertEquals('{{var1}}', $processor->process('{{var1}}'));
     }
 
     public function testSetVars()

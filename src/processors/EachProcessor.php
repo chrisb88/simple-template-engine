@@ -14,7 +14,7 @@ namespace simpleTemplate\processors;
  */
 class EachProcessor extends BaseProcessor
 {
-    private static $regex = '/({{\#each (.+?)}}(\r\n|\r|\n)?)(.+)({{\/each}}(\r\n|\r|\n)?)/s';
+    private static $regex = '/({{\#each (.+?)}}(\r\n|\r|\n)?)(.+)?({{\/each}}(\r\n|\r|\n)?)/s';
 
     /**
      * @param string $template Text to process
@@ -23,7 +23,7 @@ class EachProcessor extends BaseProcessor
     public function process(string $template): string
     {
         $template = preg_replace_callback(self::$regex, function($matches) {
-            if (isset($matches[2]) && isset($matches[4])) {
+            if (!empty($matches[2]) && !empty($matches[4])) {
                 /** @var array $var */
                 $var = $this->getVar($matches[2]);
                 if ($var !== null) {
@@ -48,7 +48,7 @@ class EachProcessor extends BaseProcessor
         $text = self::processUnless($text, $currentIndex, $maxLength);
 
         $text = preg_replace_callback('/{{(\w+)}}/', function($matches) use ($vars) {
-            if (isset($matches[1])) {
+            if (!empty($matches[1])) {
                 foreach ($vars as $var => $value) {
                     if ($matches[1] === $var) {
                         return $value;
