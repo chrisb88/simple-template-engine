@@ -7,11 +7,12 @@ use simpleTemplate\TemplateProcessorConfig;
 
 final class TemplateTest extends TestCase
 {
-    public static $templateFile = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'template.tmpl';
+    public static $templatePath = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR;
 
     public function testCanBeCreatedFromValidTemplate(): void
     {
-        $template = new Template(self::$templateFile, new TemplateProcessorConfig());
+        $templateFile = self::$templatePath .  'template.tmpl';
+        $template = new Template($templateFile, new TemplateProcessorConfig());
         $this->assertInstanceOf(Template::class, $template);
     }
 
@@ -35,7 +36,48 @@ final class TemplateTest extends TestCase
             \simpleTemplate\processors\SimpleVarProcessor::class
         ]);
 
-        $template = new Template(self::$templateFile, $config);
+        $templateFile = self::$templatePath .  'template.tmpl';
+        $template = new Template($templateFile, $config);
+        $template->setVar('Name', 'chris');
+        $template->setVar('Stuff', [
+            [
+                'Thing' => 'roses',
+                'Desc' => 'red'
+            ],
+            [
+                'Thing' => 'violets',
+                'Desc' => 'blue'
+            ],
+            [
+                'Thing' => 'you',
+                'Desc' => 'able to solve this'
+            ],
+            [
+                'Thing' => 'we',
+                'Desc' => 'interested in you'
+            ]
+        ]);
+
+        $output = $template->render();
+        $this->assertEquals($expected, $output);
+    }
+
+    public function testCorrectOutputForExtraTemplate(): void
+    {
+        $expected = "Hey chris, here's a slightly better formatted poem for you:\n"
+            . "\n"
+            . "  roses are red,\n"
+            . "  violets are blue,\n"
+            . "  you are able to solve this,\n"
+            . "  we are interested in you!\n";
+
+        $config = new TemplateProcessorConfig([
+            \simpleTemplate\processors\EachProcessor::class,
+            \simpleTemplate\processors\SimpleVarProcessor::class
+        ]);
+
+        $templateFile = self::$templatePath .  'extra.tmpl';
+        $template = new Template($templateFile, $config);
         $template->setVar('Name', 'chris');
         $template->setVar('Stuff', [
             [
