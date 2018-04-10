@@ -2,10 +2,11 @@
 declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
+use simpleTemplate\processors\SimpleVarProcessor;
 
 final class SimpleVarProcessorTest extends TestCase
 {
-    public function testSimpleVarProcessorMultiLine()
+    public function testMultiLine()
     {
         $template = <<<EOT
 Text {{var1}} and more text
@@ -21,7 +22,7 @@ I am at the beginning of line
 and at the end of the line is me
 EOT;
 
-        $processor = new \simpleTemplate\processors\SimpleVarProcessor([
+        $processor = new SimpleVarProcessor([
             'var1' => 'number one',
             'var2' => 'stands',
             'var3' => 'I am',
@@ -32,17 +33,12 @@ EOT;
         $this->assertEquals($expected, $output);
     }
 
-    public function testSimpleVarProcessorSingleLine()
+    public function testSingleLine()
     {
-        $template = <<<EOT
-{{var1}} here {{var2}} more text {{var3}}.
-EOT;
+        $template = '{{var1}} here {{var2}} more text {{var3}}.';
+        $expected = 'Text here and more text here.';
 
-        $expected = <<<EOT
-Text here and more text here.
-EOT;
-
-        $processor = new \simpleTemplate\processors\SimpleVarProcessor([
+        $processor = new SimpleVarProcessor([
             'var1' => 'Text',
             'var2' => 'and',
             'var3' => 'here',
@@ -52,4 +48,16 @@ EOT;
         $this->assertEquals($expected, $output);
     }
 
+    public function testMissingVar()
+    {
+        $template = '{{var1}} here {{var2}} more text {{var3}}.';
+        $expected = '{{var1}} here and more text {{var3}}.';
+
+        $processor = new SimpleVarProcessor([
+            'var2' => 'and',
+        ]);
+
+        $output = $processor->process($template);
+        $this->assertEquals($expected, $output);
+    }
 }
